@@ -15,7 +15,9 @@ app.set('views', './views/pages');//视图的默认目录
 app.set('view engine', 'jade');
 
 
-app.use(bodyParser.urlencoded())//提交表单时，将表单中的数据格式化
+app.use(bodyParser.urlencoded({
+  extended: true
+}))//提交表单时，将表单中的数据格式化
 
 app.use(serveStatic('bower_components'))//请求样式或js文件时，向bowercomponents中查找
 
@@ -64,17 +66,22 @@ app.get('/', (req, res) => {
 
 // detail page
 app.get('/movie/:id', (req, res) => {
-
+  console.log('idxinxi:', req.params.id);
   var id = req.params.id;
-
-  Movie.findById(id, function(err, movie) {
-    console.log("movie详情:", movie);
-    res.render('detail', {
-      title: 'imooc ' + movie.title,
-      movie: movie
+  if(id){
+    Movie.findById(id, function(err, movie) {
+      console.log("movie详情:", movie);
+      if (err) {
+        console.log(err);
+        console.log("在这里出现了错误");
+        return;
+      }
+      res.render('detail', {
+        title: 'imooc ' + movie.title,
+        movie: movie
+      });
     });
-  });
-  
+  }
 });
 
 // list pages
@@ -167,6 +174,8 @@ app.post('/admin/movie/new', function(req, res){
       if(err){
         console.log(err);
       }
+      console.log("**********")
+      console.log(movie);
       res.redirect('/movie/' + movie._id);
     })
   }
