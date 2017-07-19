@@ -1,0 +1,24 @@
+{
+  "name": "moviedemo",
+  "description": "",
+  "main": "app.js",
+  "authors": [
+    "Huang <837317210@qq.com>"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "imooc"
+  ],
+  "homepage": "https://github.com/Mrjing/movieDemo",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/libs",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}
