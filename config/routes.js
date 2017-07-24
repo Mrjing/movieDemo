@@ -9,47 +9,27 @@ module.exports = function(app){
   //pre handle user
   app.use(function(req, res, next){
     var _user = req.session.user;
-
-    if(_user){
-      app.locals.user = _user;
-    }
+    app.locals.user = _user;
     next()
   })
 
-  // index page
+  // index 
   app.get('/', Index.index);
 
-  //signup
+  //user 
   app.post('/user/signup', User.signup)
-
-
-  //signin
   app.post('/user/signin', User.signin)
-
-  //logout
+  app.get('/signin', User.showSignin)
+  app.get('/signup', User.showSignup)
   app.get('/logout', User.logout)
+  app.get('/admin/user/list', User.signinRequired, User.adminRequired ,User.list);
 
-
-  // userlist pages
-  app.get('/admin/userlist', User.list);
-
-  // detail page
+  // movie 
   app.get('/movie/:id', Movie.detail);
-
-  // list pages
-  app.get('/admin/list', Movie.list);
-
-  //
-  app.get('/admin/new', Movie.new);
-
-
-  //admin update movie
-  app.get('/admin/update/:id', Movie.update)
-
-  // admin post movie
-  app.post('/admin/movie/new', Movie.save)
-
-  //list delete movie
-  app.delete('/admin/list', Movie.del)
+  app.get('/admin/movie/list', User.signinRequired, User.adminRequired ,Movie.list);
+  app.get('/admin/movie/new', User.signinRequired, User.adminRequired ,Movie.new);
+  app.get('/admin/movie/update/:id', User.signinRequired, User.adminRequired ,Movie.update)
+  app.post('/admin/movie/new', User.signinRequired, User.adminRequired ,Movie.save)
+  app.delete('/admin/movie/list', User.signinRequired, User.adminRequired ,Movie.del)
 }
 

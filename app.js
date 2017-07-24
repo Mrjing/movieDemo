@@ -15,7 +15,7 @@ var dbUrl = 'mongodb://localhost/imooc';
 
 mongoose.connect(dbUrl)
 
-app.set('views', './views/pages');//视图的默认目录
+app.set('views', './app/views/pages');//视图的默认目录
 
 app.set('view engine', 'jade');
 
