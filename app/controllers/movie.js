@@ -1,4 +1,5 @@
 var Movie = require('../models/movie');
+var Comment = require('../models/comment');
 var _ = require('underscore');
 
 // detail page
@@ -7,16 +8,25 @@ exports.detail = (req, res) => {
   var id = req.params.id;
   if(id){
     Movie.findById(id, function(err, movie) {
+
       console.log("movie详情:", movie);
       if (err) {
         console.log(err);
         console.log("在这里出现了错误");
         return;
       }
-      res.render('detail', {
-        title: 'imooc ' + movie.title,
-        movie: movie
-      });
+      Comment
+      .find({movie: id})//先找到评论这部电影的评论
+      .populate('from', 'name')
+      .populate('reply.from reply.to', 'name')
+      .exec(function(err, comments){
+        // console.log(comments)
+        res.render('detail', {
+          title: 'imooc ' + movie.title,
+          movie: movie,
+          comments: comments
+        });
+      })
     });
   }
 }
