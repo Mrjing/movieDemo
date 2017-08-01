@@ -1,4 +1,5 @@
 var Movie = require('../models/movie');
+var Category = require('../models/category')
 var Comment = require('../models/comment');
 var _ = require('underscore');
 
@@ -58,20 +59,14 @@ exports.list = (req, res) => {
 
 //admin new page
 exports.new = (req, res) => {
-
-  res.render('admin', {
-    title: 'imooc 后台录入页',
-    movie:  {
-      title: '',
-      doctor: '',
-      country: '',
-      year: '',
-      poster: '',
-      flash: '',
-      summary: '',
-      language: ''
-    }
-  });
+  Category.find({}, function(err, categories){
+    res.render('admin', {
+      title: 'imooc 后台录入页',
+      categories: categories,
+      movie: {}
+    });
+  })
+  
 }
 
 
@@ -95,7 +90,7 @@ exports.save = function(req, res){
   var id = req.body.movie._id;
   var movieObj = req.body.movie;
   var _movie;
-  if(id !== 'undefined'){
+  if(id){
     console.log("已存在的");
     Movie.findById(id, function(err, movie){
       if(err){
@@ -111,27 +106,26 @@ exports.save = function(req, res){
     })
   }else{
     console.log("新生成的");
-    _movie = new Movie({
-      doctor: movieObj.doctor,
-      title: movieObj.title,
-      country: movieObj.country,
-      language: movieObj.language,
-      year: movieObj.year,
-      poster: movieObj.poster,
-      summary: movieObj.summary,
-      flash: movieObj.flash,
-    });
+    _movie = new Movie(movieObj);
+    var categoryId = _movie.category
+
     _movie.save(function(err, movie) {
       if(err){
         console.log(err);
       }
       console.log("**********")
       console.log(movie);
-      res.redirect('/movie/' + movie._id);
+
+      Category.findById(categoryId, function(err, category){
+        category.movies.push(movie._id)
+        category.save(function(err, category){
+          res.redirect('/movie/' + movie._id);
+        })
+      })
+      
     })
   }
 }
-
 
 
 //list delete movie

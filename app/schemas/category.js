@@ -2,19 +2,9 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 var ObjectId = Schema.Types.ObjectId
 
-var MovieSchema = new Schema({
-	doctor: String,
-	title: String,
-	language: String,
-	country: String,
-	summary: String,
-	flash: String,
-	poster: String,
-	year: Number,
-	category: {
-		type:ObjectId,
-		ref: 'Category'
-	},
+var CategorySchema = new mongoose.Schema({
+	name: String,
+	movies: [{type: ObjectId, ref: 'Movie'}],
 	meta: {
 		createAt: {
 			type: Date,
@@ -27,7 +17,7 @@ var MovieSchema = new Schema({
 	}
 })
 
-MovieSchema.pre('save', function(next){//执行save方法前，先判断是不是新创建的，是的话更新meta的createAt,updateAt信息
+CategorySchema.pre('save', function(next){//执行save方法前，先判断是不是新创建的，是的话更新meta的createAt,updateAt信息
 	if (this.isNew) {
 		this.meta.createAt = this.meta.updateAt = Date.now()
 	}else{//否则只更新updateAt信息
@@ -37,7 +27,7 @@ MovieSchema.pre('save', function(next){//执行save方法前，先判断是不�
 })
 
 
-MovieSchema.statics = {
+CategorySchema.statics = {
 	fetch: function(cb){
 		return this
 		.find({})
@@ -51,4 +41,4 @@ MovieSchema.statics = {
 	}
 }
 
-module.exports = MovieSchema
+module.exports = CategorySchema
