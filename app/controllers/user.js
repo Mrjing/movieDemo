@@ -124,7 +124,6 @@ exports.signinRequired = (req, res, next) => {
   if(!user){
     res.redirect('/signin')
   }  
-
   next()
 }
 

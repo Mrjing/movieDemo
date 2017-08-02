@@ -5,6 +5,7 @@ var path = require('path');
 var mongoose = require('mongoose');
 
 var cookieParser = require('cookie-parser');
+var multiparty = require('connect-multiparty');
 var session = require('express-session');
 var mongoStore = require('connect-mongo')(session);
 var logger = require('morgan');
@@ -24,6 +25,7 @@ app.use(bodyParser.urlencoded({
 }))//提交表单时，将表单中的数据格式化
 
 app.use(cookieParser())//cookie解析的中间件，一定要放到session中间件之前
+app.use(multiparty())//上传文件用到
 app.use(session({//保存会话状态
   secret: 'imooc',
   store: new mongoStore({

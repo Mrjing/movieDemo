@@ -53,7 +53,6 @@ exports.save = function(req, res){
       }
       res.redirect('/admin/category/list');
     })
-  
 }
 
 

@@ -2,12 +2,21 @@ var Movie = require('../models/movie');
 var Category = require('../models/category')
 var Comment = require('../models/comment');
 var _ = require('underscore');
+var fs = require('fs')
+var path = require('path')
+
 
 // detail page
 exports.detail = (req, res) => {
   console.log('idxinxi:', req.params.id);
   var id = req.params.id;
   if(id){
+    Movie.update({_id:id}, {$inc: {pv:1}}, function(err){
+      if(err){
+        console.log(err)
+      }
+    })
+
     Movie.findById(id, function(err, movie) {
 
       console.log("movie详情:", movie);
@@ -76,20 +85,51 @@ exports.update = function(req,res){
   var id = req.params.id;
   if(id){
     Movie.findById(id, function(err, movie){
-      res.render('admin', {
-        title: 'imooc后台更新页',
-        movie: movie
+      Category.find({}, function(err, categories){
+        res.render('admin', {
+          title: 'imooc后台更新页',
+          movie: movie,
+          categories: categories
+        })
       })
     })
   }
 }
 
+//admin poster
+exports.savePoster = function(req, res, next){
+  var posterData = req.files.uploadPoster
+  var filePath = posterData.path
+  var originalFilename = posterData.originalFilename
+
+  if(originalFilename){
+    fs.readFile(filePath, function(err, data){
+      var timestamp = Date.now()
+      var type = posterData.type.split('/')[1]
+      var poster = timestamp + '.' + type
+      var newPath = path.join(__dirname, '../../', '/public/upload/' + poster)
+      
+      fs.writeFile(newPath, data, function(err){
+        req.poster = poster;
+        next()
+      })
+    })
+  }
+  else {
+      next()
+  }
+}
 
 // admin post movie
 exports.save = function(req, res){
   var id = req.body.movie._id;
   var movieObj = req.body.movie;
   var _movie;
+
+  if (req.poster){
+    movieObj.poster = req.poster
+  }
+
   if(id){
     console.log("已存在的");
     Movie.findById(id, function(err, movie){
@@ -107,21 +147,36 @@ exports.save = function(req, res){
   }else{
     console.log("新生成的");
     _movie = new Movie(movieObj);
-    var categoryId = _movie.category
-
+    var categoryId = movieObj.category
+    var categoryName = movieObj.categoryName
     _movie.save(function(err, movie) {
       if(err){
         console.log(err);
       }
-      console.log("**********")
-      console.log(movie);
 
-      Category.findById(categoryId, function(err, category){
-        category.movies.push(movie._id)
-        category.save(function(err, category){
-          res.redirect('/movie/' + movie._id);
+      if(categoryId){
+        Category.findById(categoryId, function(err, category){
+          category.movies.push(movie._id)
+          category.save(function(err, category){
+            res.redirect('/movie/' + movie._id);
+          })
         })
-      })
+      }else if(categoryName){
+        var category = new Category({
+          name: categoryName,
+          movies: [movie._id]
+        })
+
+
+        category.save(function(err, category){
+          movie.category = category._id;
+          movie.save(function(err, movie){
+            res.redirect('/movie/' + movie._id);
+          })
+          
+        })
+      }
+      
       
     })
   }
