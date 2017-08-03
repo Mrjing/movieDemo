@@ -35,7 +35,7 @@ exports.signup = function(req, res){
       res.redirect('/signin')
     }else{
       console.log("user不存在");
-      var user = new User(_user);
+      user = new User(_user);
       user.save(function(err, user){
         if(err){
           console.log(err)
@@ -51,8 +51,6 @@ exports.signup = function(req, res){
   //
   console.log(_user)
 }
-
-
 
   //signin
 exports.signin = function(req, res){

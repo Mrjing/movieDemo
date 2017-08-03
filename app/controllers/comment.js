@@ -1,5 +1,5 @@
 var Comment = require('../models/comment');
-
+var Movie = require('../models/movie')
 // comment
 exports.save = function(req, res){
   var _comment = req.body.comment;

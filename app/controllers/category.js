@@ -1,9 +1,5 @@
 var Category = require('../models/category')
-
-
-
-
-
+var Movie = require('../models/movie')
 // list pages
 exports.list = (req, res) => {
   Category.fetch(function(err, categories){
